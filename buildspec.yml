@@ -1,0 +1,38 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.11
+    commands:
+      - pip install --upgrade pip
+      - pip install -r requirements.txt
+  pre_build:
+    commands:
+      - python -m unittest discover -s tests -v
+  build:
+    commands:
+      - echo "Build stage completed"
+  post_build:
+    commands:
+      - |
+        python - <<'PY'
+        import json
+        import os
+        from datetime import datetime, timezone
+
+        build_info = {
+            "git_commit": os.getenv("CODEBUILD_RESOLVED_SOURCE_VERSION", "unknown"),
+            "build_timestamp": datetime.now(timezone.utc).isoformat(),
+        }
+        with open("build_info.json", "w", encoding="utf-8") as f:
+            json.dump(build_info, f)
+        PY
+
+artifacts:
+  files:
+    - app.py
+    - requirements.txt
+    - build_info.json
+    - appspec.yml
+    - scripts/**/*
