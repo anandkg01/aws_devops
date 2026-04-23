@@ -350,6 +350,9 @@ Parameters:
     Type: AWS::EC2::VPC::Id
   SubnetId:
     Type: AWS::EC2::Subnet::Id
+  LatestAmiId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64
 
 Resources:
   ArtifactBucket:
@@ -433,7 +436,7 @@ Resources:
   DemoInstance:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: ami-0f88e80871fd81e91
+      ImageId: !Ref LatestAmiId
       InstanceType: !Ref InstanceType
       IamInstanceProfile: !Ref EC2InstanceProfile
       KeyName: !Ref KeyPairName
